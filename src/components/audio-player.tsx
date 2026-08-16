@@ -1,0 +1,20 @@
+'use client';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import type { AudioTrack } from '@/types';
+
+type PlayerState = { track: AudioTrack | null; playing: boolean; currentTime: number; duration: number; volume: number; error: string | null; queue: AudioTrack[] };
+type PlayerContextValue = PlayerState & { playTrack: (track: AudioTrack) => void; toggle: () => void; seek: (seconds: number) => void; setVolume: (volume: number) => void; next: () => void; previous: () => void; removeFromQueue: (id: string) => void };
+const PlayerContext = createContext<PlayerContextValue | null>(null);
+export function useAudioPlayer(): PlayerContextValue { const value = useContext(PlayerContext); if (!value) throw new Error('useAudioPlayer must be used inside PlayerProvider'); return value; }
+export function PlayerProvider({ children }: { children: React.ReactNode }) {
+  const audio = useRef<HTMLAudioElement | null>(null); const [track, setTrack] = useState<AudioTrack | null>(null); const [playing, setPlaying] = useState(false); const [currentTime, setCurrentTime] = useState(0); const [duration, setDuration] = useState(0); const [volume, setVolumeState] = useState(.8); const [error, setError] = useState<string | null>(null); const [queue, setQueue] = useState<AudioTrack[]>([]);
+  useEffect(() => { const element = new Audio(); audio.current = element; element.volume = .8; const time = () => setCurrentTime(element.currentTime); const ready = () => setDuration(Number.isFinite(element.duration) ? element.duration : 0); const ended = () => { setPlaying(false); }; const failed = () => { setPlaying(false); setError('Preview could not be played. The stream may be unavailable or unsupported by this browser.'); }; element.addEventListener('timeupdate', time); element.addEventListener('loadedmetadata', ready); element.addEventListener('ended', ended); element.addEventListener('error', failed); return () => { element.pause(); element.removeEventListener('timeupdate', time); element.removeEventListener('loadedmetadata', ready); element.removeEventListener('ended', ended); element.removeEventListener('error', failed); }; }, []);
+  const playTrack = useCallback((nextTrack: AudioTrack) => { const element = audio.current; if (!element) return; setError(null); setTrack(nextTrack); setQueue(items => items.some(item => item.id === nextTrack.id) ? items : [...items, nextTrack]); element.src = nextTrack.streamUrl; element.play().then(() => setPlaying(true)).catch(() => setError('Preview requires a browser-supported stream.')); }, []);
+  const toggle = useCallback(() => { const element = audio.current; if (!element || !track) return; if (element.paused) element.play().then(() => setPlaying(true)).catch(() => setError('Preview could not be started.')); else { element.pause(); setPlaying(false); } }, [track]);
+  const seek = useCallback((seconds: number) => { if (audio.current) audio.current.currentTime = seconds; }, []);
+  const setVolume = useCallback((nextVolume: number) => { const safe = Math.max(0, Math.min(1, nextVolume)); if (audio.current) audio.current.volume = safe; setVolumeState(safe); }, []);
+  const move = useCallback((direction: 1 | -1) => { if (!track) return; const index = queue.findIndex(item => item.id === track.id); const candidate = queue[index + direction]; if (candidate) playTrack(candidate); }, [playTrack, queue, track]);
+  const next = useCallback(() => move(1), [move]); const previous = useCallback(() => move(-1), [move]); const removeFromQueue = useCallback((id: string) => setQueue(items => items.filter(item => item.id !== id)), []);
+  const value = useMemo(() => ({ track, playing, currentTime, duration, volume, error, queue, playTrack, toggle, seek, setVolume, next, previous, removeFromQueue }), [track, playing, currentTime, duration, volume, error, queue, playTrack, toggle, seek, setVolume, next, previous, removeFromQueue]);
+  return <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>;
+}

@@ -1,0 +1,16 @@
+node_modules/
+.next/
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+credentials/
+secrets/
+tokens/
+.vercel/
+dist/
+coverage/
+*.log
+*.tsbuildinfo
+.seeker-git/

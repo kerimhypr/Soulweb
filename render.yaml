@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: soulseek-web-ui
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 22.14.0
+      - key: NEXT_PUBLIC_DEMO_MODE
+        value: "false"

@@ -1,0 +1,9 @@
+export type TransferState = 'queued' | 'transferring' | 'paused' | 'completed' | 'failed';
+export type SearchResult = { id: string; file: string; user: string; format: string; bitrate: string; size: string; duration: string; slots: string; available: boolean; previewUrl?: string };
+export type AudioTrack = { id: string; title: string; artist: string; duration?: number; streamUrl: string };
+export type SoulseekUser = { username: string; status: string; description?: string; files?: number; directories?: number };
+export type UserFile = { filename: string; size: number; extension: string };
+export type ServerStatus = { connected: boolean; address?: string; message: string };
+export type Transfer = { id: string; file: string; user: string; size: string; transferred: string; progress: number; speed: string; eta: string; state: TransferState; direction: 'download' | 'upload' };
+export type ConnectionStatus = { connected: boolean; mode: 'demo' | 'live' | 'unconfigured'; message: string };
+export type ApiResponse<T> = { data: T } | { error: string };
