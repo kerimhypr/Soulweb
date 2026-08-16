@@ -30,6 +30,14 @@ export async function ensureSchema(): Promise<void> {
           username TEXT NOT NULL, encrypted_password TEXT NOT NULL, encrypted_api_url TEXT, encrypted_api_token TEXT,
           port INTEGER NOT NULL DEFAULT 2234, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
         );
+        CREATE TABLE IF NOT EXISTS soulseek_workers (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          user_id UUID NOT NULL UNIQUE REFERENCES app_users(id) ON DELETE CASCADE,
+          provider TEXT NOT NULL, service_id TEXT, private_endpoint TEXT,
+          status TEXT NOT NULL CHECK (status IN ('pending', 'provisioning', 'ready', 'failed', 'deleting')),
+          last_error TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS soulseek_workers_status_idx ON soulseek_workers(status);
       `);
     } finally { client.release(); }
   })().catch(error => { schemaPromise = undefined; throw error; });
