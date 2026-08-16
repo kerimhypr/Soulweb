@@ -9,8 +9,12 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 22.14.0
-          - key: NEXT_PUBLIC_DEMO_MODE
-            value: "false"
+      - key: NEXT_PUBLIC_DEMO_MODE
+        value: "false"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: soulweb-db
+          property: connectionString
 databases:
   - name: soulweb-db
     plan: free
