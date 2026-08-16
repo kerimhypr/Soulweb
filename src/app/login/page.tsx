@@ -1,2 +1,2 @@
-import { SetupScreen } from '@/components/setup-screen';
-export default function LoginPage() { return <SetupScreen />; }
+import { AuthScreen } from '@/components/auth-screen';
+export default function LoginPage() { return <AuthScreen mode="login" />; }

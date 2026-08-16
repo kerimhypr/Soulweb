@@ -1,0 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+-- Runtime schema creation is idempotent in src/lib/db.ts; this file is the auditable migration source.
+CREATE TABLE IF NOT EXISTS app_users (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), email TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE TABLE IF NOT EXISTS app_sessions (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), user_id UUID NOT NULL REFERENCES app_users(id) ON DELETE CASCADE, token_hash TEXT NOT NULL UNIQUE, expires_at TIMESTAMPTZ NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE TABLE IF NOT EXISTS soulseek_connections (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), user_id UUID NOT NULL UNIQUE REFERENCES app_users(id) ON DELETE CASCADE, username TEXT NOT NULL, encrypted_password TEXT NOT NULL, encrypted_api_url TEXT, encrypted_api_token TEXT, port INTEGER NOT NULL DEFAULT 2234, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now());
