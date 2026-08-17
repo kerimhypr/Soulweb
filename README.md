@@ -71,7 +71,7 @@ If live operations are unavailable, confirm the gateway URL, credentials, port, 
 
 ## Roadmap
 
-Implement a specific gateway adapter, secure persistent sessions, real-time transfer events, and browser stream endpoints.
+Implement a specific gateway adapter, secure persistent sessions, realtime transfer events, and browser stream endpoints.
 
 ## Contributing
 
