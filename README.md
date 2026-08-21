@@ -1,6 +1,6 @@
 # Soulweb
 
-A web Seeker client for a compatible Soulseek backend such as slskd. It does not implement the Soulseek protocol in the browser.
+A web Seeker client for a compatible Soulseek backend such as slskd. It does not implement the soulseek protocol in the browser.
 
 ## Features
 
